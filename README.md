@@ -3,7 +3,7 @@
 A Django based web application for real-time updation of map as per the runner location for order delivery system
 
 **Technology Stack**   
-1. HTML   
+1. HTML/CSS   
 2. JavaScript
 3. Django
 4. Django Channels
