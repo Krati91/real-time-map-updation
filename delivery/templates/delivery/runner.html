@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Order Tacking
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    {% if order.id %}
+    <div class="input-group mb-3 mt-5" style="width: 350px;">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="inputGroup-sizing-default">Runner Location</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" id="runner-location">
+    </div>
+    {% else %}
+    <div class="mt-4" id="order-map">
+        {{map |safe}}
+    </div>
+    {% endif %}
+    <input type="hidden" value="{{order.id}}" id="order-id">
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"></script>
+<script>
+    const {host, pathname} = window.location;
+    
+    order_id = $('#order-id').val();
+    
+    if (order_id){
+        const endpoint = `ws://${host}/order/${order_id}`;
+    
+        const locationInput = $('#runner-location');
+
+        const socket = new ReconnectingWebSocket(endpoint);
+
+        socket.onopen = function(e){
+            console.log('open', e);
+            locationInput.on('change', function(e){
+                const location = $(this).val();
+                data = {
+                    location
+                }
+
+                socket.send(JSON.stringify(data));
+                console.log(data)
+                locationInput.val('');
+            });
+        }
+
+        socket.onerror = function(e){
+            console.log('error', e);
+        }
+
+        socket.onclose = function(e){
+            console.log('close', e);
+        }
+    }
+</script>    
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Order Tacking
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="mt-4" id="order-map">
+        {{map |safe}}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"></script>
+<script>
+    const {host, pathname} = window.location;
+    const order_id = pathname.split('/')[3];
+    
+    const endpoint = `ws://${host}/order/${order_id}`;
+    console.log(endpoint);
+    const map = $('#order-map');
+
+    const socket = new ReconnectingWebSocket(endpoint);
+
+    socket.onmessage = function(e){
+        console.log('message',e);
+        map.empty();
+        map.append(JSON.parse(e.data));
+    }
+
+    socket.onopen = function(e){
+        console.log('open', e);
+    }
+
+    socket.onerror = function(e){
+        console.log('error', e);
+    }
+
+    socket.onclose = function(e){
+        console.log('close', e);
+    }
+
+
+</script>    
+{% endblock %}
