@@ -114,3 +114,38 @@ def create_runner_map(location):
     m = m._repr_html_()
 
     return m
+
+
+def create_vendor_map(vendor_location, buyer_location, runner_location, color='orange', icon='stop'):
+    buyer_coords = get_coords(buyer_location)
+    current_coords = get_coords(runner_location)
+    vendor_coords = get_coords(vendor_location)
+
+    distance = get_distance(vendor_location, runner_location)
+
+    # to create the map
+    m = folium.Map(width=350, height=400,
+                   location=get_center_coords(vendor_location, runner_location), zoom_start=get_map_zoom(distance))
+
+    # marker for buyer
+    folium.Marker(buyer_coords,
+                  tooltip='click here for more', popup=buyer_location, icon=folium.Icon(color='red', icon='home')).add_to(m)
+
+    # marker for runner
+    folium.Marker(current_coords, tooltip='click here for more',
+                  popup=runner_location, icon=folium.Icon(color=color, icon=icon)).add_to(m)
+
+    # marker for vendor
+    folium.Marker(vendor_coords,
+                  tooltip='click here for more', popup=vendor_location, icon=folium.Icon(color='green', icon='shopping-cart')).add_to(m)
+
+    route_points = get_route(vendor_location, runner_location)
+    # print(route_points)
+    # for route between the buyer and the vendor
+    line = folium.vector_layers.PolyLine(
+        route_points, weigth=2, color='blue')
+    m.add_child(line)
+
+    m = m._repr_html_()
+
+    return m

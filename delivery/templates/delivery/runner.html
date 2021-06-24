@@ -7,6 +7,9 @@ Order Tacking
 {% block body %}
 <div class="container">
     {% if order.id %}
+    <div class="mt-4" id="order-map">
+        {{map |safe}}
+    </div>
     <div class="input-group mb-3 mt-5" style="width: 350px;">
         <div class="input-group-prepend">
           <span class="input-group-text" id="inputGroup-sizing-default">Runner Location</span>
@@ -14,7 +17,7 @@ Order Tacking
         <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" id="runner-location">
     </div>
     {% else %}
-    <div class="mt-4" id="order-map">
+    <div class="mt-4" id="runner-map">
         {{map |safe}}
     </div>
     {% endif %}
@@ -34,6 +37,7 @@ Order Tacking
         const endpoint = `ws://${host}/order/${order_id}`;
     
         const locationInput = $('#runner-location');
+        const map = $('#order-map');
 
         const socket = new ReconnectingWebSocket(endpoint);
 
@@ -49,6 +53,16 @@ Order Tacking
                 console.log(data)
                 locationInput.val('');
             });
+        }
+
+        socket.onmessage = function(e){
+            console.log('message',e);
+        
+            const data = JSON.parse(e.data);
+            const mapData = JSON.parse(data.map)
+        
+            map.empty();
+            map.append(mapData);
         }
 
         socket.onerror = function(e){
