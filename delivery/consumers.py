@@ -33,6 +33,7 @@ class OrderConsumer(AsyncConsumer):
             loaded_dict_data = json.loads(front_text)
 
             runner_location = loaded_dict_data.get('location')
+            await self.update_runner_location(runner_location)
             buyer_location = await self.get_buyer_location()
             vendor_location = await self.get_vendor_location()
 
@@ -79,3 +80,8 @@ class OrderConsumer(AsyncConsumer):
     @database_sync_to_async
     def get_vendor_location(self):
         return self.order.get_vendor_city()
+
+    @database_sync_to_async
+    def update_runner_location(self, location):
+        self.order.orderstatus_set.get(status=2).holder.address_set.filter(
+            is_primary=True).update(city=location)
